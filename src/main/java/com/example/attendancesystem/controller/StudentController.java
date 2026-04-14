@@ -28,10 +28,7 @@ public class StudentController {
         return Arrays.asList("JavaEE开发实践","计算机组成原理",
                 "机器学习与数据挖掘","数据库原理与应用","大学物理实验");
     }
-    @GetMapping("/{id}")
-    public String getStudentById(@PathVariable String id){
-        return "查询学号为"+id+"的学生信息";
-    }
+
     @GetMapping("/search")
     public String searchStudent(@RequestParam String name,
                                 @RequestParam(defaultValue = "1")int page){
