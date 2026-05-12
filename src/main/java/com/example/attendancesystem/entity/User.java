@@ -1,13 +1,29 @@
 package com.example.attendancesystem.entity;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "user")
+
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "username", nullable = false, unique = true, length = 50)
     private String username;
+
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
+
+    @Column(name = "real_name", nullable = false, length = 50)
     private String realName;
-    private String role;
+
+    @Column(name = "role", nullable = false, length = 20)
+    private String role;  // ADMIN, TEACHER, STUDENT
+
+    @Column(name = "create_time")
     private LocalDateTime createTime;
 
     // 无参构造函数
@@ -21,7 +37,7 @@ public class User {
         this.password = password;
         this.realName = realName;
         this.role = role;
-        this.createTime = createTime;
+        this.createTime = LocalDateTime.now();
     }
 
     // Getter 和 Setter

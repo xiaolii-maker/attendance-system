@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>用户注册 - 班级考勤系统</title>
+    <style>
+        /* 保持原有样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .register-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 450px;
+            padding: 40px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .error-msg {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .role-select {
+            margin-bottom: 20px;
+        }
+        .error-input {
+            border-color: #c33 !important;
+        }
+        .error-text {
+            color: #c33;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <h2>用户注册</h2>
+
+    <!-- 显示后端错误信息 -->
+    <div th:if="${errorMsg}" class="error-msg" th:text="${errorMsg}"></div>
+
+    <form id="registerForm" th:action="@{/user/register-page}" method="post" onsubmit="return validateForm()">
+        <div class="form-group">
+            <label>用户名：</label>
+            <input type="text" id="username" name="username" required placeholder="请输入用户名"/>
+        </div>
+        <div class="form-group">
+            <label>真实姓名：</label>
+            <input type="text" id="realName" name="realName" required placeholder="请输入真实姓名"/>
+        </div>
+        <div class="form-group">
+            <label>密码：</label>
+            <input type="password" id="password" name="password" required placeholder="请输入密码"/>
+        </div>
+        <div class="form-group">
+            <label>确认密码：</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="请再次输入密码"/>
+            <div id="passwordError" class="error-text"></div>
+        </div>
+        <div class="role-select">
+            <label>角色：</label>
+            <select name="role">
+                <option value="STUDENT">学生</option>
+                <option value="TEACHER">教师</option>
+            </select>
+        </div>
+        <button type="submit">注册</button>
+    </form>
+
+    <div class="login-link">
+        已有账号？ <a href="/login">立即登录</a>
+    </div>
+</div>
+
+<script>
+    function validateForm() {
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('confirmPassword').value;
+        var passwordError = document.getElementById('passwordError');
+
+        if (password !== confirmPassword) {
+            passwordError.innerHTML = '两次输入的密码不一致！';
+            document.getElementById('confirmPassword').classList.add('error-input');
+            return false;  // 阻止表单提交
+        } else {
+            passwordError.innerHTML = '';
+            document.getElementById('confirmPassword').classList.remove('error-input');
+            return true;   // 允许表单提交
+        }
+    }
+
+    // 实时检查（输入时验证）
+    document.getElementById('confirmPassword').addEventListener('input', function() {
+        var password = document.getElementById('password').value;
+        var confirmPassword = this.value;
+        var passwordError = document.getElementById('passwordError');
+
+        if (password !== confirmPassword) {
+            passwordError.innerHTML = '两次输入的密码不一致！';
+            this.classList.add('error-input');
+        } else {
+            passwordError.innerHTML = '';
+            this.classList.remove('error-input');
+        }
+    });
+</script>
+</body>
+</html>
