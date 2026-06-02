@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>学生信息</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" />
+</head>
+<body>
+<div class="container mt-4">
+    <h2>学生信息</h2>
+    <form th:action="@{/page/student/save}" th:method="post" th:object="${student}">
+        <div class="mb-3">
+            <label>学号</label>
+            <input type="text" th:field="*{studentId}" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>姓名</label>
+            <input type="text" th:field="*{name}" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>班级</label>
+            <select th:field="*{className}" class="form-select">
+                <option value="">请选择</option>
+                <option value="人工智能1班">人工智能1班</option>
+                <option value="人工智能2班">人工智能2班</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label>性别</label><br/>
+            <input type="radio" th:field="*{gender}" value="男"/> 男
+            <input type="radio" th:field="*{gender}" value="女"/> 女
+        </div>
+        <div class="mb-3">
+            <label>年龄</label>
+            <input type="number" th:field="*{age}" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">保存</button>
+        <a href="/page/student/list" class="btn btn-secondary">返回</a>
+        <a href="/page/dashboard" class="btn btn-secondary">🏠 返回首页</a>
+    </form>
+</div>
+</body>
+</html>

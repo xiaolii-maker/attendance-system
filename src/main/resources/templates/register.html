@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>用户注册 - 班级考勤系统</title>
     <style>
-        /* 保持原有样式 */
         * {
             margin: 0;
             padding: 0;
@@ -71,6 +70,14 @@
             margin-bottom: 20px;
             text-align: center;
         }
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
         .login-link {
             text-align: center;
             margin-top: 20px;
@@ -96,10 +103,15 @@
 <div class="register-container">
     <h2>用户注册</h2>
 
+    <!-- 显示注册成功提示 -->
+    <div th:if="${param.success}" class="success-msg">
+        ✅ 注册成功！请登录
+    </div>
+
     <!-- 显示后端错误信息 -->
     <div th:if="${errorMsg}" class="error-msg" th:text="${errorMsg}"></div>
 
-    <form id="registerForm" th:action="@{/user/register-page}" method="post" onsubmit="return validateForm()">
+    <form id="registerForm" th:action="@{/page/register}" method="post" onsubmit="return validateForm()">
         <div class="form-group">
             <label>用户名：</label>
             <input type="text" id="username" name="username" required placeholder="请输入用户名"/>
@@ -122,13 +134,14 @@
             <select name="role">
                 <option value="STUDENT">学生</option>
                 <option value="TEACHER">教师</option>
+                <option value="ADMIN">管理员</option>
             </select>
         </div>
         <button type="submit">注册</button>
     </form>
 
     <div class="login-link">
-        已有账号？ <a href="/login">立即登录</a>
+        已有账号？ <a href="/page/login">立即登录</a>
     </div>
 </div>
 
@@ -141,28 +154,31 @@
         if (password !== confirmPassword) {
             passwordError.innerHTML = '两次输入的密码不一致！';
             document.getElementById('confirmPassword').classList.add('error-input');
-            return false;  // 阻止表单提交
+            return false;
         } else {
             passwordError.innerHTML = '';
             document.getElementById('confirmPassword').classList.remove('error-input');
-            return true;   // 允许表单提交
+            return true;
         }
     }
 
-    // 实时检查（输入时验证）
-    document.getElementById('confirmPassword').addEventListener('input', function() {
-        var password = document.getElementById('password').value;
-        var confirmPassword = this.value;
-        var passwordError = document.getElementById('passwordError');
+    // 实时检查
+    var confirmInput = document.getElementById('confirmPassword');
+    if (confirmInput) {
+        confirmInput.addEventListener('input', function() {
+            var password = document.getElementById('password').value;
+            var confirmPassword = this.value;
+            var passwordError = document.getElementById('passwordError');
 
-        if (password !== confirmPassword) {
-            passwordError.innerHTML = '两次输入的密码不一致！';
-            this.classList.add('error-input');
-        } else {
-            passwordError.innerHTML = '';
-            this.classList.remove('error-input');
-        }
-    });
+            if (password !== confirmPassword) {
+                passwordError.innerHTML = '两次输入的密码不一致！';
+                this.classList.add('error-input');
+            } else {
+                passwordError.innerHTML = '';
+                this.classList.remove('error-input');
+            }
+        });
+    }
 </script>
 </body>
 </html>

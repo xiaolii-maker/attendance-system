@@ -1,16 +1,35 @@
 package com.example.attendancesystem.controller;
 
+import com.example.attendancesystem.entity.Student;
+import com.example.attendancesystem.entity.User;
+import com.example.attendancesystem.repository.StudentRepository;
+import com.example.attendancesystem.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @Controller
+@RequestMapping("/page")
 public class PageController {
 
-    /**
-     * 登录页面
-     */
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    // ========== 登录注册页面 ==========
+
     @GetMapping("/login")
     public String loginPage(@RequestParam(required = false) String error, Model model) {
         if (error != null) {
@@ -19,20 +38,104 @@ public class PageController {
         return "login";
     }
 
-    /**
-     * 注册页面
-     */
     @GetMapping("/register")
     public String registerPage() {
         return "register";
     }
 
-    /**
-     * 系统首页（登录成功后跳转）
-     */
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         model.addAttribute("title", "班级考勤管理系统");
         return "dashboard";
+    }
+
+    // ========== 页面表单注册 ==========
+
+    @PostMapping("/register")
+    public String registerPageForm(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String confirmPassword,
+            @RequestParam String realName,
+            @RequestParam(defaultValue = "STUDENT") String role,
+            Model model) {
+
+        // 检查密码是否一致
+        if (!password.equals(confirmPassword)) {
+            model.addAttribute("errorMsg", "两次输入的密码不一致");
+            return "register";
+        }
+
+        // 检查密码长度
+        if (password.length() < 6) {
+            model.addAttribute("errorMsg", "密码长度不能少于6位");
+            return "register";
+        }
+
+        // 检查用户名是否已存在
+        if (userRepository.existsByUsername(username)) {
+            model.addAttribute("errorMsg", "用户名 " + username + " 已存在");
+            return "register";
+        }
+
+        // 密码加密存储
+        String encodedPassword = passwordEncoder.encode(password);
+
+        // 创建新用户
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(encodedPassword);
+        user.setRealName(realName);
+        user.setRole(role);
+        user.setCreateTime(java.time.LocalDateTime.now());
+
+        userRepository.save(user);
+
+        // 注册成功后跳转到登录页
+        return "redirect:/page/login?success";
+    }
+
+    // ========== 学生管理页面 ==========
+
+    @GetMapping("/student/list")
+    public String studentList(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Student> studentPage = studentRepository.findAll(pageable);
+
+        model.addAttribute("students", studentPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", studentPage.getTotalPages());
+        model.addAttribute("size", size);
+
+        return "student-list";
+    }
+
+    @GetMapping("/student/add")
+    public String addStudent(Model model) {
+        model.addAttribute("student", new Student());
+        return "student-form";
+    }
+
+    @GetMapping("/student/edit/{id}")
+    public String editStudent(@PathVariable String id, Model model) {
+        Optional<Student> student = studentRepository.findById(id);
+        model.addAttribute("student", student.orElse(new Student()));
+        return "student-form";
+    }
+
+    @PostMapping("/student/save")
+    public String saveStudent(@ModelAttribute Student student) {
+        studentRepository.save(student);
+        return "redirect:/page/student/list";
+    }
+
+    @GetMapping("/student/delete/{id}")
+    public String deleteStudent(@PathVariable String id) {
+        studentRepository.deleteById(id);
+        return "redirect:/page/student/list";
     }
 }

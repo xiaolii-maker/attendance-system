@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,7 +15,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -38,32 +36,32 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. 禁用 CSRF（允许表单提交）
                 .csrf(csrf -> csrf.disable())
-
-                // 2. 配置授权
                 .authorizeHttpRequests(auth -> auth
-                        // 公开页面和接口
-                        .requestMatchers("/login", "/register", "/dashboard",
-                                "/user/login", "/user/register", "/user/register-page",
-                                "/css/**", "/js/**").permitAll()
-                        // 其他请求需要认证
+                        // 公开页面
+                        .requestMatchers("/page/login", "/page/register", "/page/dashboard",
+                                "/user/login", "/user/register",
+                                "/css/**", "/js/**", "/webjars/**").permitAll()
+                        // 学生管理页面
+                        .requestMatchers("/page/student/list", "/page/student/add",
+                                "/page/student/edit/**", "/page/student/save",
+                                "/page/student/delete/**").permitAll()
+                        // 考勤页面
+                        .requestMatchers("/attendance/checkin", "/attendance/list",
+                                "/attendance/checkin/**", "/attendance/list/**").permitAll()
+                        // 其他所有请求需要认证
                         .anyRequest().authenticated()
                 )
-
-                // 3. 配置表单登录
                 .formLogin(form -> form
-                        .loginPage("/login")                    // 自定义登录页面
-                        .loginProcessingUrl("/user/login")      // 登录表单提交地址
-                        .defaultSuccessUrl("/dashboard", true)  // 登录成功跳转
-                        .failureUrl("/login?error")             // 登录失败跳转
+                        .loginPage("/page/login")
+                        .loginProcessingUrl("/user/login")
+                        .defaultSuccessUrl("/page/dashboard", true)
+                        .failureUrl("/page/login?error")
                         .permitAll()
                 )
-
-                // 4. 配置退出登录
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/page/login?logout")
                         .permitAll()
                 );
 

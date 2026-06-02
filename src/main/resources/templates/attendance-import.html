@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>批量导入考勤记录</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" />
+</head>
+<body>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">批量导入考勤记录</h3>
+        </div>
+        <div class="card-body">
+            <!-- 提示信息 -->
+            <div th:if="${successMsg}" class="alert alert-success">
+                <span th:text="${successMsg}"></span>
+            </div>
+            <div th:if="${errorMsg}" class="alert alert-danger">
+                <span th:text="${errorMsg}"></span>
+            </div>
+
+            <!-- 上传表单 -->
+            <form id="uploadForm" th:action="@{/attendance/import}" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label">选择Excel文件</label>
+                    <input type="file" class="form-control" name="file" id="fileInput" accept=".xlsx, .xls" required />
+                    <div class="form-text">支持 .xlsx 和 .xls 格式，文件大小不超过 10MB</div>
+                </div>
+
+                <div class="mb-3">
+                    <a th:href="@{/template/attendance.xlsx}" class="btn btn-secondary">下载模板</a>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn btn-primary">上传并导入</button>
+            </form>
+            <div class="mt-3">
+                <a href="/page/dashboard" class="btn btn-secondary">🏠 返回首页</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
