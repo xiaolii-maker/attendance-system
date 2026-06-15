@@ -38,17 +38,30 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // 公开页面
-                        .requestMatchers("/page/login", "/page/register", "/page/dashboard",
-                                "/user/login", "/user/register",
-                                "/css/**", "/js/**", "/webjars/**").permitAll()
-                        // 学生管理页面
+                        // ========== 公开页面（免登录）==========
+                        .requestMatchers(
+                                "/page/login", "/page/register",
+                                "/task/scan", "/task/doCheckin",
+                                "/attendance/checkin", "/attendance/doCheckin",
+                                "/attendance/taskCheckin", "/attendance/checkin-submit",
+                                "/css/**", "/js/**", "/webjars/**"
+                        ).permitAll()
+
+                        // ========== 需要登录的页面 ==========
+                        // 任务管理（教师专用）
+                        .requestMatchers("/task/publish", "/task/list").authenticated()
+                        // 考勤记录
+                        .requestMatchers("/attendance/list").authenticated()
+                        // 批量导入
+                        .requestMatchers("/attendance/import", "/student/import",
+                                "/template/attendance.xlsx", "/template/student.xlsx").authenticated()
+                        // 学生管理
                         .requestMatchers("/page/student/list", "/page/student/add",
                                 "/page/student/edit/**", "/page/student/save",
-                                "/page/student/delete/**").permitAll()
-                        // 考勤页面
-                        .requestMatchers("/attendance/checkin", "/attendance/list",
-                                "/attendance/checkin/**", "/attendance/list/**").permitAll()
+                                "/page/student/delete/**").authenticated()
+                        // 请假相关
+                        .requestMatchers("/leave/add", "/leave/submit",
+                                "/leave/approve", "/leave/approve/**").authenticated()
                         // 其他所有请求需要认证
                         .anyRequest().authenticated()
                 )

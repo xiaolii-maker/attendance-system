@@ -43,7 +43,7 @@ public class AttendanceImportService {
     }
 
     /**
-     * 解析 Excel 并导入数据
+     * 解析 Excel 并导入数据（带去重检查）
      */
     public ImportResult importFromExcel(MultipartFile file) {
         ImportResult result = new ImportResult();
@@ -64,11 +64,11 @@ public class AttendanceImportService {
 
                 try {
                     // 读取单元格数据
-                    String studentId = getCellValue(row.getCell(0));
-                    String courseId = getCellValue(row.getCell(1));
-                    String checkInTimeStr = getCellValue(row.getCell(2));
-                    String status = getCellValue(row.getCell(3));
-                    String remark = getCellValue(row.getCell(4));
+                    String studentId = getCellValue(row.getCell(0)).trim();
+                    String courseId = getCellValue(row.getCell(1)).trim();
+                    String checkInTimeStr = getCellValue(row.getCell(2)).trim();
+                    String status = getCellValue(row.getCell(3)).trim();
+                    String remark = getCellValue(row.getCell(4)).trim();
 
                     // 数据验证
                     if (studentId.isEmpty() || courseId.isEmpty() || checkInTimeStr.isEmpty()) {
@@ -98,6 +98,15 @@ public class AttendanceImportService {
                     if (checkInTime == null) {
                         result.incrementFail();
                         result.addErrorMessage("第" + (i + 1) + "行：打卡时间格式错误");
+                        continue;
+                    }
+
+                    // ========== 去重检查：判断是否已存在相同的考勤记录 ==========
+                    boolean exists = attendanceRepository.existsByStudentIdAndCourseIdAndCheckInTime(
+                            studentId, courseId, checkInTime);
+                    if (exists) {
+                        result.incrementFail();
+                        result.addErrorMessage("第" + (i + 1) + "行：考勤记录已存在（学号：" + studentId + "，课程：" + courseId + "，时间：" + checkInTimeStr + "），跳过");
                         continue;
                     }
 
@@ -138,23 +147,17 @@ public class AttendanceImportService {
      */
     private String getCellValue(Cell cell) {
         if (cell == null) return "";
-
         switch (cell.getCellType()) {
             case STRING:
                 return cell.getStringCellValue().trim();
             case NUMERIC:
-                // 判断是否是日期类型
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    // 格式化为标准日期时间格式
-                    return cell.getLocalDateTimeCellValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                // 处理数字类型（Excel中的数字）
+                double numValue = cell.getNumericCellValue();
+                // 判断是否为整数
+                if (numValue == (long) numValue) {
+                    return String.valueOf((long) numValue);
                 } else {
-                    // 数字类型转字符串
-                    double numValue = cell.getNumericCellValue();
-                    if (numValue == (long) numValue) {
-                        return String.valueOf((long) numValue);
-                    } else {
-                        return String.valueOf(numValue);
-                    }
+                    return String.valueOf(numValue);
                 }
             case BOOLEAN:
                 return String.valueOf(cell.getBooleanCellValue());
@@ -178,7 +181,7 @@ public class AttendanceImportService {
                 "yyyy-M-d H:mm:ss",
                 "yyyy/M/d H:mm:ss",
                 "yyyy-M-d H:mm",
-                "yyyy/M/d H:mm"     // 2024/5/26 14:15:00
+                "yyyy/M/d H:mm"
         };
 
         for (String pattern : patterns) {

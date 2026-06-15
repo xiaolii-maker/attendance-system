@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的任务</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" />
+</head>
+<body>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h3 class="mb-0">📋 我发布的任务</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>任务码</th>
+                    <th>任务名称</th>
+                    <th>课程</th>
+                    <th>开始时间</th>
+                    <th>结束时间</th>
+                    <th>状态</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="task : ${tasks}">
+                    <td><strong th:text="${task.taskCode}">—</strong></td>
+                    <td th:text="${task.taskName}">—</td>
+                    <td th:text="${task.courseName}">—</td>
+                    <td th:text="${#temporals.format(task.startTime, 'yyyy-MM-dd HH:mm')}">—</td>
+                    <td th:text="${#temporals.format(task.endTime, 'yyyy-MM-dd HH:mm')}">—</td>
+                    <td>
+                        <span th:if="${task.status == 'ACTIVE' and #temporals.createNow().isAfter(task.endTime)}" class="badge bg-secondary">已过期</span>
+                        <span th:if="${task.status == 'ACTIVE' and #temporals.createNow().isBefore(task.startTime)}" class="badge bg-warning">未开始</span>
+                        <span th:if="${task.status == 'ACTIVE' and #temporals.createNow().isAfter(task.startTime) and #temporals.createNow().isBefore(task.endTime)}" class="badge bg-success">进行中</span>
+                        <span th:if="${task.status != 'ACTIVE'}" class="badge bg-secondary">已关闭</span>
+                    </td>
+                </tr>
+                <tr th:if="${tasks.empty}">
+                    <td colspan="6" class="text-center">暂无发布的任务</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <a href="/task/publish" class="btn btn-primary">发布新任务</a>
+        <a href="/page/dashboard" class="btn btn-secondary">🏠 返回首页</a>
+    </div>
+</div>
+</body>
+</html>

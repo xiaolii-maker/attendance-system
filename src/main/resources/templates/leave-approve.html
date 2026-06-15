@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>缺勤审批</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" />
+</head>
+<body>
+<div class="container mt-4">
+    <!-- 待审批列表 -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h3 class="mb-0">📋 待审批申请</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>学号</th>
+                    <th>姓名</th>
+                    <th>课程</th>
+                    <th>请假日期</th>
+                    <th>类型</th>
+                    <th>原因</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="leave : ${pendingLeaves}">
+                    <td th:text="${leave.studentId}">—</td>
+                    <td th:text="${leave.studentName}">—</td>
+                    <td th:text="${leave.courseName}">—</td>
+                    <td th:text="${#temporals.format(leave.leaveDate, 'yyyy-MM-dd')}">—</td>
+                    <td>
+                        <span th:if="${leave.leaveType == 'ADVANCE'}" class="badge bg-primary">提前请假</span>
+                        <span th:if="${leave.leaveType == 'AFTER'}" class="badge bg-warning">补假条</span>
+                    </td>
+                    <td th:text="${leave.reason}">—</td>
+                    <td>
+                        <form th:action="@{/leave/approve/{id}(id=${leave.id})}" method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('通过该申请？')">通过</button>
+                        </form>
+                        <form th:action="@{/leave/approve/{id}(id=${leave.id})}" method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="reject">
+                            <input type="text" name="remark" placeholder="拒绝理由" size="10">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('拒绝该申请？')">拒绝</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${pendingLeaves.empty}">
+                    <td colspan="7" class="text-center">暂无待审批申请</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 我的审批记录 -->
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h3 class="mb-0">📋 我的审批记录</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>学号</th>
+                    <th>姓名</th>
+                    <th>课程</th>
+                    <th>请假日期</th>
+                    <th>类型</th>
+                    <th>原因</th>
+                    <th>审批结果</th>
+                    <th>审批意见</th>
+                    <th>审批时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="record : ${myApprovals}">
+                    <td th:text="${record.studentId}">—</td>
+                    <td th:text="${record.studentName}">—</td>
+                    <td th:text="${record.courseName}">—</td>
+                    <td th:text="${#temporals.format(record.leaveDate, 'yyyy-MM-dd')}">—</td>
+                    <td>
+                        <span th:if="${record.leaveType == 'ADVANCE'}" class="badge bg-primary">提前请假</span>
+                        <span th:if="${record.leaveType == 'AFTER'}" class="badge bg-warning">补假条</span>
+                    </td>
+                    <td th:text="${record.reason}">—</td>
+                    <td>
+                        <span th:if="${record.status == 'APPROVED'}" class="badge bg-success">已通过</span>
+                        <span th:if="${record.status == 'REJECTED'}" class="badge bg-danger">已拒绝</span>
+                    </td>
+                    <td th:text="${record.approveRemark != null ? record.approveRemark : '—'}">—</td>
+                    <td th:text="${#temporals.format(record.approveTime, 'yyyy-MM-dd HH:mm')}">—</td>
+                </tr>
+                <tr th:if="${myApprovals.empty}">
+                    <td colspan="9" class="text-center">暂无审批记录</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-center mt-3">
+        <a href="/page/dashboard" class="btn btn-secondary">🏠 返回首页</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>学生打卡</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" />
+</head>
+<body>
+<div class="container mt-4" style="max-width: 500px;">
+    <div class="card">
+        <div class="card-header bg-success text-white text-center">
+            <h3>📝 任务码打卡</h3>
+        </div>
+        <div class="card-body">
+            <div th:if="${errorMsg}" class="alert alert-danger">[[${errorMsg}]]</div>
+            <div th:if="${successMsg}" class="alert alert-success">[[${successMsg}]]</div>
+
+            <form action="/task/doCheckin" method="post">
+                <div class="mb-3">
+                    <label class="form-label">🆔 学号</label>
+                    <input type="text" name="studentId" class="form-control" placeholder="请输入学号" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">📝 任务码</label>
+                    <input type="text" name="taskCode" class="form-control" placeholder="请输入教师发布的任务码" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">✅ 打卡</button>
+            </form>
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <a href="/page/dashboard" class="btn btn-secondary">🏠 返回首页</a>
+    </div>
+</div>
+</body>
+</html>

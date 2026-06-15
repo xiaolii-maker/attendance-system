@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>请假申请</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" />
+    <style>
+        .type-card { cursor: pointer; transition: all 0.2s; border: 2px solid #dee2e6; }
+        .type-card:hover { transform: translateY(-3px); border-color: #667eea; }
+        .type-card.selected { border-color: #667eea; background: #f0f4ff; }
+    </style>
+</head>
+<body>
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card">
+        <div class="card-header bg-warning">
+            <h3 class="mb-0">📝 请假申请</h3>
+        </div>
+        <div class="card-body">
+            <div th:if="${successMsg}" class="alert alert-success">[[${successMsg}]]</div>
+            <div th:if="${errorMsg}" class="alert alert-danger">[[${errorMsg}]]</div>
+
+            <!-- 请假类型选择 -->
+            <div class="mb-4">
+                <label class="form-label fw-bold">请假类型</label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card type-card p-3 text-center" id="advanceCard" onclick="selectType('ADVANCE')">
+                            <div class="fs-1">📅</div>
+                            <h5 class="mt-2">提前请假</h5>
+                            <small class="text-muted">提前告知缺勤</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card type-card p-3 text-center" id="afterCard" onclick="selectType('AFTER')">
+                            <div class="fs-1">📝</div>
+                            <h5 class="mt-2">补交假条</h5>
+                            <small class="text-muted">事后补交缺勤说明</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form th:action="@{/leave/submit}" method="post">
+                <input type="hidden" name="leaveType" id="leaveTypeInput" value="ADVANCE">
+
+                <div class="mb-3">
+                    <label class="form-label">请假日期</label>
+                    <input type="date" name="leaveDate" id="leaveDate" class="form-control" required/>
+                    <div class="form-text" id="dateHint">💡 提前请假：请选择未来的日期</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">选择课程</label>
+                    <select name="courseId" class="form-select" required>
+                        <option value="">请选择课程</option>
+                        <option th:each="course : ${courses}" th:value="${course.courseId}"
+                                th:text="${course.courseName} + ' - ' + ${course.className}"></option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">请假原因</label>
+                    <textarea name="reason" class="form-control" rows="4" placeholder="请详细说明请假原因..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100" id="submitBtn">📅 提交请假申请</button>
+            </form>
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <a href="/page/dashboard" class="btn btn-secondary">🏠 返回首页</a>
+    </div>
+</div>
+
+<script>
+    const today = new Date().toISOString().split('T')[0];
+    const leaveDate = document.getElementById('leaveDate');
+    const dateHint = document.getElementById('dateHint');
+    const advanceCard = document.getElementById('advanceCard');
+    const afterCard = document.getElementById('afterCard');
+    const leaveTypeInput = document.getElementById('leaveTypeInput');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function selectType(type) {
+        leaveTypeInput.value = type;
+
+        if (type === 'ADVANCE') {
+            advanceCard.classList.add('selected');
+            afterCard.classList.remove('selected');
+            leaveDate.min = today;
+            dateHint.innerHTML = '💡 提前请假：请选择未来的日期';
+            submitBtn.innerHTML = '📅 提交请假申请';
+        } else {
+            afterCard.classList.add('selected');
+            advanceCard.classList.remove('selected');
+            leaveDate.min = '';
+            dateHint.innerHTML = '💡 补交假条：请选择缺勤的日期';
+            submitBtn.innerHTML = '📝 提交补假条申请';
+        }
+    }
+
+    // 默认选择提前请假
+    selectType('ADVANCE');
+</script>
+</body>
+</html>

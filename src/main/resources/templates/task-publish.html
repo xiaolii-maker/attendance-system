@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>发布打卡任务</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" />
+</head>
+<body>
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">📢 发布打卡任务</h3>
+        </div>
+        <div class="card-body">
+            <div th:if="${successMsg}" class="alert alert-success">[[${successMsg}]]</div>
+            <div th:if="${errorMsg}" class="alert alert-danger">[[${errorMsg}]]</div>
+
+            <div th:if="${taskCode}" class="alert alert-info text-center">
+                <strong>任务码：</strong> <span style="font-size:24px;">[[${taskCode}]]</span><br>
+                <small>请将此任务码告知学生，学生输入学号和任务码即可打卡</small>
+            </div>
+
+            <form th:action="@{/task/publish}" method="post">
+                <div class="mb-3">
+                    <label class="form-label">选择课程</label>
+                    <select name="courseId" class="form-select" required>
+                        <option value="">请选择课程</option>
+                        <option th:each="course : ${courses}" th:value="${course.courseId}"
+                                th:text="${course.courseName} + ' - ' + ${course.className}"></option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">任务名称</label>
+                    <input type="text" name="taskName" class="form-control" placeholder="例如：第5次课堂打卡" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">开始打卡时间</label>
+                    <input type="datetime-local" name="startTime" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">结束打卡时间</label>
+                    <input type="datetime-local" name="endTime" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">发布任务</button>
+            </form>
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <a href="/page/dashboard" class="btn btn-secondary">🏠 返回首页</a>
+        <a href="/task/list" class="btn btn-info">查看我的任务</a>
+    </div>
+</div>
+</body>
+</html>

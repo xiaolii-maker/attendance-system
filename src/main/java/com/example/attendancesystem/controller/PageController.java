@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +30,18 @@ public class PageController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * 获取当前登录用户
+     */
+    private User getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            String username = ((UserDetails) principal).getUsername();
+            return userRepository.findByUsername(username).orElse(null);
+        }
+        return null;
+    }
+
     // ========== 登录注册页面 ==========
 
     @GetMapping("/login")
@@ -46,6 +60,15 @@ public class PageController {
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         model.addAttribute("title", "班级考勤管理系统");
+
+        // 获取当前登录用户信息
+        User currentUser = getCurrentUser();
+        if (currentUser != null) {
+            model.addAttribute("username", currentUser.getUsername());
+            model.addAttribute("realName", currentUser.getRealName());
+            model.addAttribute("role", currentUser.getRole());
+        }
+
         return "dashboard";
     }
 
@@ -60,28 +83,23 @@ public class PageController {
             @RequestParam(defaultValue = "STUDENT") String role,
             Model model) {
 
-        // 检查密码是否一致
         if (!password.equals(confirmPassword)) {
             model.addAttribute("errorMsg", "两次输入的密码不一致");
             return "register";
         }
 
-        // 检查密码长度
         if (password.length() < 6) {
             model.addAttribute("errorMsg", "密码长度不能少于6位");
             return "register";
         }
 
-        // 检查用户名是否已存在
         if (userRepository.existsByUsername(username)) {
             model.addAttribute("errorMsg", "用户名 " + username + " 已存在");
             return "register";
         }
 
-        // 密码加密存储
         String encodedPassword = passwordEncoder.encode(password);
 
-        // 创建新用户
         User user = new User();
         user.setUsername(username);
         user.setPassword(encodedPassword);
@@ -91,7 +109,6 @@ public class PageController {
 
         userRepository.save(user);
 
-        // 注册成功后跳转到登录页
         return "redirect:/page/login?success";
     }
 
@@ -138,4 +155,6 @@ public class PageController {
         studentRepository.deleteById(id);
         return "redirect:/page/student/list";
     }
+
+
 }

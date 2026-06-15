@@ -32,4 +32,6 @@ public interface StudentRepository extends JpaRepository<Student, String>, JpaSp
     // 6. 根据年龄范围分页查询
     @Query("SELECT s FROM Student s WHERE s.age BETWEEN :minAge AND :maxAge")
     Page<Student> findByAgeBetween(@Param("minAge") Integer minAge, @Param("maxAge") Integer maxAge, Pageable pageable);
+
+    List<Student> findByClassName(String className);
 }
