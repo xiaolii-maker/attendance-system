@@ -130,80 +130,103 @@ java -jar target/attendance-system-0.0.1-SNAPSHOT.jar --server.port=8081
 运行：java -jar xxx.jar --spring.profiles.active=prod
 
 ### 数据库文档
-#### 1.user（用户表）
-字段名	类型	说明	备注
-id	BIGINT	主键	自增
-username	VARCHAR(50)	用户名	唯一
-password	VARCHAR(100)	密码	BCrypt加密
-real_name	VARCHAR(50)	真实姓名	
-role	VARCHAR(20)	角色	ADMIN/TEACHER/STUDENT
-create_time	DATETIME	创建时间	
-#### 2.student（学生表）
-字段名	类型	说明	备注
-student_id	VARCHAR(20)	学号	主键
-name	VARCHAR(50)	姓名	
-class_name	VARCHAR(50)	班级	
-major	VARCHAR(50)	专业	
-gender	VARCHAR(10)	性别	
-age	INT	年龄	
-create_time	DATETIME	创建时间	
-#### 3.course（课程表）
-字段名	类型	说明	备注
-course_id	VARCHAR(20)	课程编号	主键
-course_name	VARCHAR(100)	课程名称	
-class_name	VARCHAR(50)	班级名称	
-teacher_id	BIGINT	教师ID	外键
-start_time	TIME	上课时间	
-end_time	TIME	下课时间	
-create_time	DATETIME	创建时间	
-#### 4.attendance（考勤记录表）
-字段名	类型	说明	备注
-id	INT	主键	自增
-student_id	VARCHAR(20)	学号	
-student_name	VARCHAR(50)	学生姓名	
-course_id	VARCHAR(20)	课程编号	
-course_name	VARCHAR(100)	课程名称	
-check_in_time	DATETIME	打卡时间	
-status	VARCHAR(20)	状态	NORMAL/LATE
-remark	VARCHAR(255)	备注	
-create_time	DATETIME	创建时间	
-#### 5.task（打卡任务表）
-字段名	类型	说明	备注
-id	BIGINT	主键	自增
-task_code	VARCHAR(20)	任务码	6位数字，唯一
-course_id	VARCHAR(20)	课程编号	
-course_name	VARCHAR(100)	课程名称	
-task_name	VARCHAR(100)	任务名称	
-start_time	DATETIME	开始时间	
-end_time	DATETIME	结束时间	
-status	VARCHAR(20)	状态	ACTIVE/EXPIRED
-create_by	VARCHAR(50)	创建人	
-#### 6.leave_request（请假申请表）
-字段名	类型	说明	备注
-id	BIGINT	主键	自增
-student_id	VARCHAR(20)	学号	
-student_name	VARCHAR(50)	学生姓名	
-course_id	VARCHAR(20)	课程编号	
-course_name	VARCHAR(100)	课程名称	
-leave_date	DATETIME	请假日期	
-reason	VARCHAR(500)	请假原因	
-leave_type	VARCHAR(20)	类型	ADVANCE/AFTER
-status	VARCHAR(20)	状态	PENDING/APPROVED/REJECTED
-approve_remark	VARCHAR(200)	审批意见	
-#### 7.class_info（班级信息表）
-字段名	类型	说明	备注
-id	BIGINT	主键	自增
-class_name	VARCHAR(50)	班级名称	唯一
-grade	VARCHAR(10)	年级	
-major	VARCHAR(50)	专业	
-create_time	DATETIME	创建时间	
-#### 8.course_selection（选课表）
-字段名	类型	说明	备注
-id	INT	主键	自增
-student_id	VARCHAR(20)	学号	
-student_name	VARCHAR(50)	学生姓名	
-course_id	VARCHAR(20)	课程编号	
-select_time	DATETIME	选课时间	
+### 1. user（用户表）
+
+| 字段名 | 类型 | 说明 | 备注 |
+|--------|------|----|------|
+| id | BIGINT | 主键 | 自增 |
+| username | VARCHAR(50) | 用户名 | 唯一 |
+| password | VARCHAR(100) | 密码 | BCrypt加密 |
+| real_name | VARCHAR(50) | 真实姓名 | |
+| role | VARCHAR(20) | 角色 | ADMIN/TEACHER/STUDENT |
+| create_time | DATETIME | 创建时间 | |
+
+### 2. student（学生表）
+
+| 字段名 | 类型 | 说明 | 备注 |
+|--------|------|------|------|
+| student_id | VARCHAR(20) | 学号 | 主键 |
+| name | VARCHAR(50) | 姓名 | |
+| class_name | VARCHAR(50) | 班级 | |
+| major | VARCHAR(50) | 专业 | |
+| gender | VARCHAR(10) | 性别 | |
+| age | INT | 年龄 | |
+| create_time | DATETIME | 创建时间 | |
+
+### 3. course（课程表）
+
+| 字段名 | 类型 | 说明 | 备注 |
+|--------|------|------|------|
+| course_id | VARCHAR(20) | 课程编号 | 主键 |
+| course_name | VARCHAR(100) | 课程名称 | |
+| class_name | VARCHAR(50) | 班级名称 | |
+| teacher_id | BIGINT | 教师ID | 外键 |
+| start_time | TIME | 上课时间 | |
+| end_time | TIME | 下课时间 | |
+| create_time | DATETIME | 创建时间 | |
+
+### 4. attendance（考勤记录表）
+
+| 字段名 | 类型 | 说明 | 备注 |
+|--------|------|------|------|
+| id | INT | 主键 | 自增 |
+| student_id | VARCHAR(20) | 学号 | |
+| student_name | VARCHAR(50) | 学生姓名 | |
+| course_id | VARCHAR(20) | 课程编号 | |
+| course_name | VARCHAR(100) | 课程名称 | |
+| check_in_time | DATETIME | 打卡时间 | |
+| status | VARCHAR(20) | 状态 | NORMAL/LATE |
+| remark | VARCHAR(255) | 备注 | |
+| create_time | DATETIME | 创建时间 | |
+
+### 5. task（打卡任务表）
+
+| 字段名 | 类型 | 说明 | 备注 |
+|--------|------|------|------|
+| id | BIGINT | 主键 | 自增 |
+| task_code | VARCHAR(20) | 任务码 | 6位数字，唯一 |
+| course_id | VARCHAR(20) | 课程编号 | |
+| course_name | VARCHAR(100) | 课程名称 | |
+| task_name | VARCHAR(100) | 任务名称 | |
+| start_time | DATETIME | 开始时间 | |
+| end_time | DATETIME | 结束时间 | |
+| status | VARCHAR(20) | 状态 | ACTIVE/EXPIRED |
+| create_by | VARCHAR(50) | 创建人 | |
+
+### 6. leave_request（请假申请表）
+
+| 字段名 | 类型 | 说明 | 备注 |
+|--------|------|------|------|
+| id | BIGINT | 主键 | 自增 |
+| student_id | VARCHAR(20) | 学号 | |
+| student_name | VARCHAR(50) | 学生姓名 | |
+| course_id | VARCHAR(20) | 课程编号 | |
+| course_name | VARCHAR(100) | 课程名称 | |
+| leave_date | DATETIME | 请假日期 | |
+| reason | VARCHAR(500) | 请假原因 | |
+| leave_type | VARCHAR(20) | 类型 | ADVANCE/AFTER |
+| status | VARCHAR(20) | 状态 | PENDING/APPROVED/REJECTED |
+| approve_remark | VARCHAR(200) | 审批意见 | |
+
+### 7. class_info（班级信息表）
+
+| 字段名 | 类型 | 说明 | 备注 |
+|--------|------|------|------|
+| id | BIGINT | 主键 | 自增 |
+| class_name | VARCHAR(50) | 班级名称 | 唯一 |
+| grade | VARCHAR(10) | 年级 | |
+| major | VARCHAR(50) | 专业 | |
+| create_time | DATETIME | 创建时间 | |
+
+### 8. course_selection（选课表）
+
+| 字段名 | 类型 | 说明 | 备注 |
+|--------|------|------|------|
+| id | INT | 主键 | 自增 |
+| student_id | VARCHAR(20) | 学号 | |
+| student_name | VARCHAR(50) | 学生姓名 | |
+| course_id | VARCHAR(20) | 课程编号 | |
+| select_time | DATETIME | 选课时间 | |
 ### 项目结构
 
 src/main/java/com/example/attendancesystem/
